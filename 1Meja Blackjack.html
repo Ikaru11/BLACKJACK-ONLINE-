@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="id"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Meja Blackjack</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:wght@500;700&family=Karla:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);--felt:#21604a;--wood:#3a2a20;--woodline:#241912;--brass:#dcb45f;--ink:#f3f4ee;--soft:rgba(243,244,238,.64);--line:rgba(243,244,238,.45);--btn:#f3f4ee;--btnink:#17372b;color-scheme:light}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--felt:#153d30;color-scheme:dark}}
+:root[data-theme="dark"]{--felt:#153d30;color-scheme:dark}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background-color:var(--felt);background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .07 0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");color:var(--ink);font:16px/1.45 Karla,system-ui,sans-serif;min-height:100vh;padding:18px 16px 250px;max-width:720px;margin:0 auto}
+h1{font:700 38px/1 "Bodoni Moda",Georgia,serif;margin:6px 0 8px}
+p{margin:0 0 10px;color:var(--soft);max-width:60ch}
+button{font:inherit;cursor:pointer;color:inherit}
+button:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid var(--brass);outline-offset:2px}
+.go{background:var(--btn);color:var(--btnink);border:0;border-radius:4px;padding:13px 18px;font-weight:700;width:100%;margin-bottom:8px}
+.go:disabled{opacity:.45;cursor:not-allowed}
+.ghost{background:transparent;border:1px solid var(--line);border-radius:4px;padding:10px 14px;font-weight:700}
+.link{background:none;border:0;padding:6px 0;text-decoration:underline;color:var(--soft)}
+.tray{background:var(--wood);border-bottom:3px solid var(--woodline);border-radius:6px;padding:10px 16px;display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:14px}
+.tray small{display:block;color:var(--soft)}
+.code{font:700 32px/1 "Bodoni Moda",Georgia,serif;letter-spacing:.14em}
+.name{font:500 20px/1.2 "Bodoni Moda",Georgia,serif;word-break:break-word}
+.bal{color:var(--soft);font-size:15px;font-variant-numeric:tabular-nums}.bal b{color:var(--ink)}
+.err{color:#ffb3a8;margin:8px 0}.up{color:#9be7b9}.dn{color:#ffb3a8}
+.status{padding:10px 14px;border:1px solid var(--line);border-radius:4px;margin:10px 0}
+.dealer{text-align:center;padding:6px 0 14px;border-bottom:1px solid var(--line);margin-bottom:6px}
+.hand{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0 4px;min-height:66px}
+.dealer .hand{justify-content:center}
+.cd{width:46px;height:66px;border-radius:6px;background:#f6f5ef;color:#1a1a1a;display:flex;flex-direction:column;align-items:center;justify-content:center;font-weight:700;line-height:1.1;box-shadow:0 2px 3px rgba(0,0,0,.45)}
+.cd b{font-size:19px}.cd span{font-size:18px}.cd.rd{color:#b3262d}
+.cd.bk{background:repeating-linear-gradient(45deg,#16382c 0 5px,#21604a 5px 10px);border:2px solid #f6f5ef}
+.pl{padding:12px 10px;border-top:1px solid rgba(243,244,238,.18);border-left:3px solid transparent}
+.pl.turn{border-left-color:var(--brass);background:rgba(0,0,0,.14)}
+.pl .top{display:flex;justify-content:space-between;gap:10px;align-items:baseline;flex-wrap:wrap}
+.chip{--s:50px;--c:#b3362d;--e:#f3f4ee;--tx:#fff;--ln:rgba(255,255,255,.7);position:relative;width:var(--s);height:var(--s);border-radius:50%;display:inline-flex;align-items:center;justify-content:center;border:0;padding:0;font-weight:700;font-size:15px;color:var(--tx);background:radial-gradient(circle,var(--c) 0 56%,transparent 57%),repeating-conic-gradient(var(--e) 0 15deg,var(--c) 15deg 30deg);box-shadow:0 1px 1px rgba(0,0,0,.5)}
+.chip::after{content:"";position:absolute;inset:17%;border-radius:50%;border:1.5px dashed var(--ln);pointer-events:none}
+.chip.d10{--c:#ebe8dc;--e:#7a7a72;--tx:#1d2b24;--ln:rgba(0,0,0,.35)}
+.chip.d50{--c:#b3362d}.chip.d100{--c:#25437d}.chip.d500{--c:#2b2b30}
+.bar{position:fixed;left:0;right:0;bottom:0;background:var(--wood);border-top:3px solid var(--woodline);padding:12px 16px calc(12px + env(safe-area-inset-bottom,0px))}
+.bar>div{max-width:720px;margin:0 auto}
+.rack{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:6px 0 10px}.rack .sp{flex:1}
+.acts{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+label{display:block;color:var(--soft);font-size:14px;margin-bottom:4px}
+select,input{font:inherit;color:var(--ink);background:rgba(0,0,0,.22);border:0;border-bottom:2px solid var(--line);border-radius:4px 4px 0 0;padding:10px 12px;width:100%}
+select option{color:#111}
+input.codein{font:700 28px "Bodoni Moda",Georgia,serif;letter-spacing:.2em;text-transform:uppercase;text-align:center}
+.form{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;margin:16px 0}
+</style></head><body>
+<div id="app"></div>
+<script src="https://cdn.jsdelivr.net/npm/peerjs@1.5.4/dist/peerjs.min.js"></script>
+<script>
+const SU=['♠','♥','♦','♣'],RK=['A','2','3','4','5','6','7','8','9','10','J','Q','K'],TEN=['10','J','Q','K'];
+let role='',mode='home',peer=null,conns={},hconn=null,S=null,V=null,me='',nm='',code='',startC=1000,draft=0,err='',busy=false;
+const $=id=>document.getElementById(id);
+const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const mk=()=>{const d=[];SU.forEach(s=>RK.forEach(r=>d.push({r,s})));for(let i=d.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[d[i],d[j]]=[d[j],d[i]]}return d};
+const draw=()=>{if(S.deck.length<20)S.deck=mk();return S.deck.pop()};
+const val=h=>{let t=0,a=0;h.forEach(c=>{if(!c)return;if(c.r==='A'){a++;t+=11}else t+=TEN.includes(c.r)?10:+c.r});while(t>21&&a){t-=10;a--}return t};
+const bj=h=>h.length===2&&val(h)===21;
+const gen=()=>{const A='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';let c='';for(let i=0;i<4;i++)c+=A[Math.floor(Math.random()*A.length)];return c};
+/* ---------- host: game logic ---------- */
+function view(){const v=JSON.parse(JSON.stringify({phase:S.phase,round:S.round,players:S.players,dealer:S.dealer,turn:S.turn}));if(S.phase==='play'&&v.dealer.length>1)v.dealer[1]=null;return v}
+function bc(){V=view();render();Object.values(conns).forEach(c=>{try{c.send({t:'s',s:V})}catch(e){}})}
+function tell(id,m){if(id!=='host'&&conns[id])try{conns[id].send(m)}catch(e){}}
+function startBet(){S.phase='bet';S.round++;S.dealer=[];S.turn=-1;S.players.forEach(p=>{p.hand=[];p.bet=0;p.locked=false;p.in=false;p.st='';p.res='';p.delta=0});bc()}
+function deal(){
+  if(!S.players.some(p=>p.locked))return;
+  S.players.forEach(p=>{p.in=p.locked;if(p.in){p.hand=[draw(),draw()];if(bj(p.hand))p.st='stand'}});
+  S.dealer=[draw(),draw()];S.phase='play';S.turn=nextIdx(-1);
+  if(S.turn<0)finish();else bc()}
+function nextIdx(i){for(let j=i+1;j<S.players.length;j++){const p=S.players[j];if(p.in&&!p.st&&p.on)return j}return -1}
+function advance(){if(S.players[S.turn].st){S.turn=nextIdx(S.turn);if(S.turn<0){finish();return}}bc()}
+function finish(){
+  const live=S.players.some(p=>p.in&&p.st==='stand'&&!bj(p.hand));
+  if(live)while(val(S.dealer)<17)S.dealer.push(draw());
+  const dv=val(S.dealer),db=bj(S.dealer);
+  S.players.forEach(p=>{if(!p.in)return;const pv=val(p.hand);let r,pay=0;
+    if(p.st==='bust')r='lose';
+    else if(bj(p.hand))r=db?'push':'bj';
+    else if(db)r='lose';
+    else if(dv>21||pv>dv)r='win';
+    else if(pv<dv)r='lose';else r='push';
+    if(r==='win')pay=p.bet*2;else if(r==='push')pay=p.bet;else if(r==='bj')pay=p.bet+Math.floor(p.bet*1.5);
+    p.chips+=pay;p.delta=pay-p.bet;p.res=r});
+  S.phase='result';S.turn=-1;bc()}
+function handle(id,d){
+  const p=S.players.find(x=>x.id===id);
+  if(d.t==='join'){
+    if(S.players.length>=4)return tell(id,{t:'err',m:'Room penuh (maksimal 4 pemain).'});
+    if(S.phase==='play')return tell(id,{t:'err',m:'Ronde sedang berjalan, coba lagi sebentar lagi.'});
+    S.players.push({id,name:String(d.name||'Pemain').slice(0,14),chips:S.start,bet:0,hand:[],st:'',res:'',delta:0,locked:false,in:false,on:true});return bc()}
+  if(!p)return;
+  if(d.t==='start'&&id==='host'&&S.phase==='lobby')return startBet();
+  if(d.t==='next'&&id==='host'&&S.phase==='result')return startBet();
+  if(d.t==='force'&&id==='host'&&S.phase==='bet')return deal();
+  if(d.t==='rebuy'&&p.chips<=0&&S.phase!=='play'){p.chips=500;return bc()}
+  if(d.t==='bet'&&S.phase==='bet'&&!p.locked&&d.amt>0&&d.amt<=p.chips){p.bet=d.amt;p.chips-=d.amt;p.locked=true;
+    const w=S.players.filter(x=>x.on&&(x.chips>0||x.locked));if(w.every(x=>x.locked))deal();else bc();return}
+  if(S.phase==='play'&&S.players[S.turn]===p&&!p.st){
+    if(d.t==='hit'){p.hand.push(draw());const v=val(p.hand);if(v>21)p.st='bust';else if(v===21)p.st='stand';advance()}
+    else if(d.t==='stand'){p.st='stand';advance()}
+    else if(d.t==='double'&&p.hand.length===2&&p.chips>=p.bet){p.chips-=p.bet;p.bet*=2;p.hand.push(draw());p.st=val(p.hand)>21?'bust':'stand';advance()}}}
+function drop(id){
+  const i=S.players.findIndex(x=>x.id===id);if(i<0)return;delete conns[id];
+  if(S.phase==='play'){const p=S.players[i];p.on=false;if(S.turn===i){p.st='stand';advance()}else bc()}
+  else{S.players.splice(i,1);if(S.phase==='bet'&&S.players.some(x=>x.locked)&&S.players.filter(x=>x.on&&(x.chips>0||x.locked)).every(x=>x.locked))deal();else bc()}}
+/* ---------- koneksi ---------- */
+function hostGo(n){
+  if(n===undefined){nm=$('nm').value.trim()||'Host';startC=+$('sc').value;busy=true;err='';render();n=0}
+  code=gen();peer=new Peer('bjrm-'+code);
+  peer.on('open',()=>{role='host';me='host';mode='game';busy=false;
+    S={phase:'lobby',round:0,start:startC,deck:mk(),dealer:[],turn:-1,players:[{id:'host',name:nm,chips:startC,bet:0,hand:[],st:'',res:'',delta:0,locked:false,in:false,on:true}]};bc()});
+  peer.on('connection',c=>{conns[c.peer]=c;c.on('data',d=>handle(c.peer,d));c.on('close',()=>drop(c.peer))});
+  peer.on('error',e=>{if(e.type==='unavailable-id'&&n<5)hostGo(n+1);else{err='Gagal membuat room ('+e.type+'). Coba lagi.';busy=false;mode='host';render()}})}
+function joinGo(){
+  code=$('cd').value.trim().toUpperCase();nm=$('nm').value.trim();
+  if(code.length<4||!nm){err='Isi kode room dan nama dulu.';render();return}
+  busy=true;err='';render();
+  peer=new Peer();
+  peer.on('open',id=>{me=id;hconn=peer.connect('bjrm-'+code,{reliable:true});
+    hconn.on('open',()=>hconn.send({t:'join',name:nm}));
+    hconn.on('data',onData);
+    hconn.on('close',()=>{if(role==='client')leave('Koneksi ke host terputus.')})});
+  peer.on('error',e=>{err=e.type==='peer-unavailable'?'Room tidak ditemukan. Cek lagi kodenya.':'Gagal tersambung ('+e.type+').';busy=false;role='';mode='join';render()})}
+function onData(d){
+  if(d.t==='s'){role='client';busy=false;mode='game';V=d.s;render()}
+  else if(d.t==='err'){err=d.m;busy=false;if(role!=='client'){mode='join'}render()}}
+function act(t,amt){const m={t,amt};if(role==='host')handle('host',m);else if(hconn)hconn.send(m)}
+function leave(msg){try{peer&&peer.destroy()}catch(e){}peer=null;conns={};hconn=null;role='';mode='home';S=V=null;draft=0;err=msg||'';busy=false;render()}
+const go=m=>{mode=m;err='';render()};
+const addBet=a=>{const me_=V.players.find(p=>p.id===me);if(draft+a<=me_.chips)draft+=a;render()};
+const setDraft=v=>{draft=v==='all'?V.players.find(p=>p.id===me).chips:0;render()};
+/* ---------- tampilan ---------- */
+const cd=c=>c?`<div class="cd${c.s==='♥'||c.s==='♦'?' rd':''}"><b>${c.r}</b><span>${c.s}</span></div>`:'<div class="cd bk"></div>';
+const hand=h=>`<div class="hand">${h.map(cd).join('')}</div>`;
+const RES={win:'Menang',bj:'Blackjack',push:'Seri',lose:'Kalah'};
+const opts=(a,c)=>a.map(v=>`<option${v===c?' selected':''}>${v}</option>`).join('');
+const errH=()=>err?`<div class="err">${esc(err)}</div>`:'';
+function render(){
+  const a=$('app');let h='';
+  if(V&&V.phase!=='bet')draft=0;
+  if(mode==='home'||(mode==='host'&&!V)||(mode==='join'&&!V)){
+    if(mode==='home')h=`<h1>Meja blackjack</h1><p>Main bareng sampai 4 orang dengan kartu digital. Dealer dijalankan bot. Satu pemain jadi host dan membuat room, yang lain masuk dengan kode.</p>${errH()}<button class="go" onclick="go('host')">Buat room (jadi host)</button><button class="go" onclick="go('join')">Gabung room</button>`;
+    else if(mode==='host')h=`<h1>Buat room</h1><div class="form"><div><label for="nm">Nama kamu</label><input id="nm" value="${esc(nm)}" maxlength="14"></div><div><label for="sc">Chip awal tiap pemain</label><select id="sc">${opts([500,1000,2000,5000],startC)}</select></div></div>${errH()}<button class="go" onclick="hostGo()"${busy?' disabled':''}>${busy?'Membuat room...':'Buat room'}</button><button class="link" onclick="go('home')">Kembali</button>`;
+    else h=`<h1>Gabung room</h1><div class="form"><div><label for="cd">Kode room dari host</label><input id="cd" class="codein" maxlength="4" autocomplete="off" value="${esc(code)}"></div><div><label for="nm">Nama kamu</label><input id="nm" value="${esc(nm)}" maxlength="14"></div></div>${errH()}<button class="go" onclick="joinGo()"${busy?' disabled':''}>${busy?'Menyambung...':'Gabung'}</button><button class="link" onclick="go('home')">Kembali</button>`;
+    a.innerHTML=h;return}
+  if(!V){a.innerHTML='<p>Menyambung...</p>';return}
+  const P=V.players,mp=P.find(p=>p.id===me)||{chips:0,locked:false},ph=V.phase,isTurn=ph==='play'&&P[V.turn]&&P[V.turn].id===me;
+  h+=`<div class="tray"><div><small>Kode room</small><span class="code">${esc(code)}</span></div><div style="text-align:right"><small>${ph==='lobby'?'Ruang tunggu':'Ronde '+V.round}</small><span class="bal">${P.length} dari 4 pemain</span></div></div>${errH()}`;
+  if(ph==='lobby')h+=`<p>Minta temanmu membuka halaman ini, pilih Gabung room, lalu masukkan kode di atas.</p>`;
+  else h+=`<div class="dealer"><div class="name">Dealer (bot)</div>${hand(V.dealer)}<div class="bal">Total <b>${V.dealer.includes(null)?'?':val(V.dealer)}</b></div></div>`;
+  P.forEach((p,i)=>{
+    let st='';
+    if(ph==='bet')st=p.locked?'Taruhan terkunci':(p.on?'Memilih taruhan...':'');
+    else if(!p.on)st='Terputus';
+    else if(ph==='play'&&!p.in)st='Tidak ikut ronde ini';
+    else if(ph==='result'&&p.in)st=`${RES[p.res]} <span class="${p.delta>0?'up':p.delta<0?'dn':''}">${p.delta>=0?'+':''}${p.delta}</span>`;
+    else if(p.st==='bust')st='Bust';
+    else if(p.st==='stand')st=bj(p.hand)?'Blackjack':'Stand';
+    h+=`<div class="pl${ph==='play'&&i===V.turn?' turn':''}"><div class="top"><span class="name">${esc(p.name)}${p.id===me?' (kamu)':''}</span><span class="bal">Chip <b>${p.chips}</b>${p.bet?' Taruhan <b>'+p.bet+'</b>':''}</span></div>${p.hand.length&&ph!=='bet'?hand(p.hand)+`<div class="bal">Total <b>${val(p.hand)}</b></div>`:''}<div class="bal">${st}</div></div>`});
+  h+=`<p style="margin-top:20px"><button class="link" onclick="leave()">Keluar dari room</button></p>`;
+  let bar='';const host=role==='host';
+  if(ph==='lobby')bar=host?`<button class="go" onclick="act('start')">Mulai main (${P.length} pemain)</button>`:`<div class="status">Menunggu host memulai...</div>`;
+  else if(ph==='bet'){
+    if(mp.locked)bar=`<div class="status">Taruhan terkirim. Menunggu pemain lain...</div>`;
+    else if(mp.chips<=0)bar=`<div class="status">Chip kamu habis.</div><button class="go" onclick="act('rebuy')">Beli ulang 500 chip</button>`;
+    else bar=`<div class="bal">Taruhan <b>${draft}</b> dari ${mp.chips} chip</div><div class="rack">${[10,50,100,500].map(v=>`<button class="chip d${v}" aria-label="Tambah ${v}" onclick="addBet(${v})">${v}</button>`).join('')}<span class="sp"></span><button class="ghost" onclick="setDraft(0)">Hapus</button><button class="ghost" onclick="setDraft('all')">All-in</button></div><button class="go" onclick="act('bet',draft)"${draft>0?'':' disabled'}>Kunci taruhan</button>`;
+    if(host&&P.some(p=>p.locked)&&!P.every(p=>p.locked||p.chips<=0))bar+=`<button class="link" onclick="act('force')">Mulai tanpa menunggu yang lain</button>`}
+  else if(ph==='play')bar=isTurn?`<div class="acts"><button class="go" onclick="act('hit')">Hit</button><button class="go" onclick="act('stand')">Stand</button><button class="go" onclick="act('double')"${mp.hand&&mp.hand.length===2&&mp.chips>=mp.bet?'':' disabled'}>Double</button></div>`:`<div class="status">${P[V.turn]?'Giliran '+esc(P[V.turn].name)+'...':'Dealer bermain...'}</div>`;
+  else bar=host?`<button class="go" onclick="act('next')">Ronde baru</button>`:`<div class="status">Menunggu host memulai ronde baru...</div>`;
+  if(ph==='result'&&mp.chips<=0)bar+=`<button class="go" onclick="act('rebuy')">Beli ulang 500 chip</button>`;
+  h+=`<div class="bar"><div>${bar}</div></div>`;
+  a.innerHTML=h}
+render();
+</script></body></html>
